@@ -4,5 +4,5 @@
 
 USER_OBJS :=
 
-LIBS := -lboost_system -lboost_program_options -lzmq
+LIBS := -lboost_system -lboost_filesystem -lboost_program_options -lzmq
 
