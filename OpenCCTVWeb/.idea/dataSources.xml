@@ -5,19 +5,26 @@
       <driver-ref>mysql</driver-ref>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://127.0.0.1/opencctv_development</jdbc-url>
+      <user-name>opencctv</user-name>
+      <user-password>dfe5dfdadfcfdfc4dfe9dfe9dffedffcdfeadf9b</user-password>
       <libraries />
     </data-source>
     <data-source source="LOCAL" name="Rails OpenCCTVWeb: test" uuid="5c6cca0e-cb8d-48ee-8fe0-1094aa2cc289">
       <driver-ref>mysql</driver-ref>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://127.0.0.1/opencctv_test</jdbc-url>
+      <user-name>opencctv</user-name>
+      <user-password>dfe5dfdadfcfdfc4dfe9dfe9dffedffcdfeadf9b</user-password>
       <libraries />
     </data-source>
     <data-source source="LOCAL" name="Rails OpenCCTVWeb: production" uuid="06e3d405-cda1-4fc1-848b-6dc7c8cdd9a9">
       <driver-ref>mysql</driver-ref>
       <jdbc-driver>com.mysql.jdbc.Driver</jdbc-driver>
       <jdbc-url>jdbc:mysql://127.0.0.1/opencctv_production</jdbc-url>
+      <user-name>opencctv</user-name>
+      <user-password>dfe5dfdadfcfdfc4dfe9dfe9dffedffcdfeadf9b</user-password>
       <libraries />
     </data-source>
   </component>
 </project>
+

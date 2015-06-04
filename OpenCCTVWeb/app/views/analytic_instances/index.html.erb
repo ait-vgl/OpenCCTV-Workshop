@@ -27,6 +27,7 @@
         <thead>
         <tr>
           <th>#</th>
+          <th>Analytic ID</th>
           <th>Name</th>
           <th>Analytic Type</th>
           <th>Description</th>
@@ -39,6 +40,7 @@
         <% @analytic_instances.each do |analytic_instance| %>
             <tr>
               <td><%= i %></td>
+              <td><%= analytic_instance.id %></td>
               <td><%= analytic_instance.name %></td>
               <td><%= analytic_instance.analytic.name %></td>
               <td><%= analytic_instance.description %></td>
