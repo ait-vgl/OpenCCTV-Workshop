@@ -31,6 +31,12 @@ const std::string PROPERTY_DB_NAME = "db_name";
 const std::string PROPERTY_DB_USERNAME = "db_username";
 const std::string PROPERTY_DB_PASSWORD = "db_password";
 
+const std::string PROPERTY_RESULTS_DB_SERVER_NAME = "results_db_server_name";
+const std::string PROPERTY_RESULTS_DB_PORT = "results_db_port";
+const std::string PROPERTY_RESULTS_DB_NAME = "results_db_name";
+const std::string PROPERTY_RESULTS_DB_USERNAME = "results_db_username";
+const std::string PROPERTY_RESULTS_DB_PASSWORD = "results_db_password";
+
 class Config {
 private:
 	static Config* _pConfig;

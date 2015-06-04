@@ -27,7 +27,7 @@ public:
 	 * using the given server IP, port number, username, password and database name.
 	 */
 	static sql::Connection* getConnection();
-	//static sql::Connection* getConnection_ResultsDB();
+	static sql::Connection* getConnection_ResultsDB();
 };
 
 } /* namespace db */

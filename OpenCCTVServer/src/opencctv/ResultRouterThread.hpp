@@ -8,6 +8,7 @@
 #include "Exception.hpp"
 #include "util/log/Loggers.hpp"
 #include "util/serialization/Serializers.hpp"
+#include "db/AnalyticResultGateway.hpp"
 
 namespace opencctv {
 

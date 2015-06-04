@@ -39,6 +39,11 @@ void ResultRouterThread::operator()()
 			analytic::AnalyticResult result = _pSerializer->deserializeAnalyticResult(*pSSerializedResult);
 			std::string sMsg = "\t\tReceived Result of ";
 			sMsg.append(result.getTimestamp());
+
+			//Saving to DB
+			opencctv::db::AnalyticResultGateway analyticResultGateway;
+			analyticResultGateway.insertResults(_iAnalyticInstanceId, result);
+
 			util::log::Loggers::getDefaultLogger()->debug(sMsg);
 			_pFlowController->received();
 			if(pSSerializedResult) delete pSSerializedResult;

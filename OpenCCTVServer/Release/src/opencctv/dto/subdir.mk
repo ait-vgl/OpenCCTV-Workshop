@@ -5,14 +5,17 @@
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
 ../src/opencctv/dto/AnalyticInstanceStream.cpp \
+../src/opencctv/dto/AnalyticResult.cpp \
 ../src/opencctv/dto/Stream.cpp 
 
 OBJS += \
 ./src/opencctv/dto/AnalyticInstanceStream.o \
+./src/opencctv/dto/AnalyticResult.o \
 ./src/opencctv/dto/Stream.o 
 
 CPP_DEPS += \
 ./src/opencctv/dto/AnalyticInstanceStream.d \
+./src/opencctv/dto/AnalyticResult.d \
 ./src/opencctv/dto/Stream.d 
 
 
