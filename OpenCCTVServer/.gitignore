@@ -32,3 +32,9 @@
 /Release/src/db/DbConnector.o
 /Release/src/db/StreamGateway.d
 /Release/src/db/StreamGateway.o
+/Release/src/db/AnalyticResultGateway.o.d
+/Release/src/db/AnalyticResultGateway.o.o
+/Release/src/dto/AnalyticResult.d
+/Release/src/dto/AnalyticResult.o
+
+
