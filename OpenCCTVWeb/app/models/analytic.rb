@@ -1,5 +1,6 @@
 class Analytic < ActiveRecord::Base
   has_many :analytic_input_streams, dependent: :destroy
+  has_many :analytic_instances, dependent: :destroy
 
   validates :name, presence: true
   validates_presence_of :filename, message: 'No analytic plugin archive selected to upload.'
