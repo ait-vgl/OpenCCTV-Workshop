@@ -29,6 +29,6 @@
 /Release/src/db/AnalyticInstanceStreamGateway.d
 /Release/src/db/AnalyticInstanceStreamGateway.o
 /Release/src/db/DbConnector.d
- /Release/src/db/DbConnector.o
+/Release/src/db/DbConnector.o
 /Release/src/db/StreamGateway.d
 /Release/src/db/StreamGateway.o
