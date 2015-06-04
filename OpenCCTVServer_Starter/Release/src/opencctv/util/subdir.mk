@@ -4,13 +4,16 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 CPP_SRCS += \
-../src/opencctv/util/Config.cpp 
+../src/opencctv/util/Config.cpp \
+../src/opencctv/util/Util.cpp 
 
 OBJS += \
-./src/opencctv/util/Config.o 
+./src/opencctv/util/Config.o \
+./src/opencctv/util/Util.o 
 
 CPP_DEPS += \
-./src/opencctv/util/Config.d 
+./src/opencctv/util/Config.d \
+./src/opencctv/util/Util.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes

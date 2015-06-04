@@ -42,7 +42,6 @@ int main(int argc, char* argv[])
 		try
 		{
 			string sRequestStr = _pServerController->readMessage();
-			cout << "sRequestStr" << sRequestStr << endl << endl;
 
 			//Determine message type
 			string sMessageType = "";
@@ -51,15 +50,15 @@ int main(int argc, char* argv[])
 			//Process the message
 			if(sMessageType.compare(opencctv::util::MSG_TYPE_START_REQ) == 0)
 			{
-				_pServerController->execServerStart(sRequestStr);
+				_pServerController->execServerStart();
 
 			} else if(sMessageType.compare(opencctv::util::MSG_TYPE_STOP_REQ) == 0)
 			{
-				_pServerController->execServerStop(sRequestStr);
+				_pServerController->execServerStop();
 
 			} else if(sMessageType.compare(opencctv::util::MSG_TYPE_RESTART_REQ) == 0)
 			{
-				_pServerController->execServerRestart(sRequestStr);
+				_pServerController->execServerRestart();
 
 			}else if(sMessageType.compare(opencctv::util::MSG_TYPE_STATUS_REQ) == 0)
 			{

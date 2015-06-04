@@ -39,12 +39,29 @@ void ResultRouterThread::operator()()
 			analytic::AnalyticResult result = _pSerializer->deserializeAnalyticResult(*pSSerializedResult);
 			std::string sMsg = "\t\tReceived Result of ";
 			sMsg.append(result.getTimestamp());
+			util::log::Loggers::getDefaultLogger()->debug(sMsg);
 
 			//Saving to DB
-			opencctv::db::AnalyticResultGateway analyticResultGateway;
-			analyticResultGateway.insertResults(_iAnalyticInstanceId, result);
+			if(result.getWriteToDatabase())
+			{
+				try
+				{
+					opencctv::db::AnalyticResultGateway analyticResultGateway;
+					analyticResultGateway.insertResults(_iAnalyticInstanceId, result);
+					sMsg = "\t\t\tResult written to the database";
+					util::log::Loggers::getDefaultLogger()->debug(sMsg);
 
-			util::log::Loggers::getDefaultLogger()->debug(sMsg);
+				}catch(opencctv::Exception &e)
+				{
+					std::ostringstream sErrorMessage;
+					sErrorMessage << "Failed to write results to the results database : analytic id - ";
+					sErrorMessage << _iAnalyticInstanceId;
+					sMsg = sErrorMessage.str();
+					util::log::Loggers::getDefaultLogger()->error(sMsg);
+				}
+			}
+
+
 			_pFlowController->received();
 			if(pSSerializedResult) delete pSSerializedResult;
 		}

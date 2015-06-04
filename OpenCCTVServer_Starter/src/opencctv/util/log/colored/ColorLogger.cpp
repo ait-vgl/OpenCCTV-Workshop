@@ -11,25 +11,26 @@ ColorLogger::ColorLogger() {
 void ColorLogger::error(const std::string& sMessage)
 {
 	boost::mutex::scoped_lock lock(_mutex);
+	std::cout << "Error: " << sMessage << std::endl;
 	std::cerr << "Error: " << "\033[31m" << sMessage << "\033[0m" << std::endl;
 }
 
 void ColorLogger::warn(const std::string& sMessage)
 {
 	boost::mutex::scoped_lock lock(_mutex);
-	std::cout << "Warning: " << "\033[33m" << sMessage << "\033[0m" << std::endl;
+	std::cerr << "Warning: " << "\033[33m" << sMessage << "\033[0m" << std::endl;
 }
 
 void ColorLogger::info(const std::string& sMessage)
 {
 	boost::mutex::scoped_lock lock(_mutex);
-	std::cout << "Info: " << "\033[34m" << sMessage << "\033[0m" << std::endl;
+	std::cerr << "Info: " << "\033[34m" << sMessage << "\033[0m" << std::endl;
 }
 
 void ColorLogger::debug(const std::string& sMessage)
 {
 	boost::mutex::scoped_lock lock(_mutex);
-	std::cout << "Debug: " << "\033[36m" << sMessage << "\033[0m" << std::endl;
+	std::cerr << "Debug: " << "\033[36m" << sMessage << "\033[0m" << std::endl;
 }
 
 ColorLogger::~ColorLogger() {
