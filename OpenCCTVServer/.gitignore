@@ -26,4 +26,9 @@
 /Release/src/opencctv/util/serialization/gpb/*.o
 /Release/src/test/gateway/*.d
 /Release/src/test/gateway/*.o
-/Release/
+/Release/src/db/AnalyticInstanceStreamGateway.d
+/Release/src/db/AnalyticInstanceStreamGateway.o
+/Release/src/db/DbConnector.d
+ /Release/src/db/DbConnector.o
+/Release/src/db/StreamGateway.d
+/Release/src/db/StreamGateway.o
