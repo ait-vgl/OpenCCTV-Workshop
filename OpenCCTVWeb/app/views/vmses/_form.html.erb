@@ -30,7 +30,7 @@
 <div class="field">
 	<%= f.label :vms_connector_id, 'VMS connector' %>
 	<br>
-	<%= f.collection_select(:vms_connector_id, VmsConnector.where('verified = 1'), :id, :name, {prompt: 'Select Analytic Type'}, {:disabled => params[:action]=="edit"}) %>
+	<%= f.collection_select(:vms_connector_id, VmsConnector.where('verified = 1'), :id, :name, {prompt: 'Select Connector Type'}, {:disabled => params[:action]=="edit"}) %>
     <% if(params[:action]=='edit') %>
       <%= "(#{@vms.vms_type})" %>
     <% end %>
