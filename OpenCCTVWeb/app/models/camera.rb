@@ -1,6 +1,7 @@
 class Camera < ActiveRecord::Base
   belongs_to :vms
   has_many :streams, dependent: :destroy
+  before_destroy :delete_frame
 
   # validates the milestone Camera
   # returns true if valid and false if invalid
@@ -59,6 +60,30 @@ class Camera < ActiveRecord::Base
     return complete, width, height
   end
 
+  def hikvision_grab_default_frame
+    url = "http://#{self.vms.server_ip}/ISAPI/Streaming/channels/#{self.camera_id}/picture"
+    uri = URI.parse(url)
+    http = Net::HTTP.new(uri.host, self.vms.server_port)
+    http.open_timeout = 5
+    http.read_timeout = 5
+    request = Net::HTTP::Get.new(uri.request_uri)
+    request.basic_auth(self.vms.username, self.vms.password)
+    # Open the file for writing
+    img_path = "#{Rails.root}/app/assets/images/#{self.vms.id}_#{self.id}.jpeg"
+    destFile = open(img_path, "wb")
+    begin
+      http.request(request) do |response|
+        # Read the data as it comes in
+        response.read_body do |part|
+          # Write the data direct to file
+          destFile.write(part)
+        end
+      end
+    ensure
+      destFile.close
+    end
+  end
+
   def set_verification(is_verified)
     if(!is_verified)
       self.streams.each do |stream|
@@ -66,6 +91,11 @@ class Camera < ActiveRecord::Base
       end
     end
     update(:verified => is_verified)
+  end
+
+  def delete_frame
+    path_to_file = "#{Rails.root}/app/assets/images/#{self.vms.id}_#{self.id}.jpeg"
+    File.delete(path_to_file) if File.exist?(path_to_file)
   end
 
   private

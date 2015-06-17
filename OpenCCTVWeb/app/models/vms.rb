@@ -15,6 +15,8 @@ class Vms < ActiveRecord::Base
       valid, xml_response = milestone_validate_vms
     elsif(self.vms_type == 'zoneminder')
       valid = zoneminder_validate_vms
+    elsif(self.vms_type == 'hikvision')
+      valid = hikvision_validate_device
     else # anything else
       valid = true
     end
@@ -38,6 +40,8 @@ class Vms < ActiveRecord::Base
         zoneminder_add_monitors(url, cookie)
         zoneminder_add_streams(url, cookie, self.cameras)
       end
+    elsif(self.vms_type == 'hikvision')
+        hikvision_add_monitors
     else
     end
   end
@@ -102,6 +106,16 @@ class Vms < ActiveRecord::Base
     return false
   end
 
+  # validates HikVision devices (DVRs, NVRs, Cameras)
+  def hikvision_validate_device
+    response = connect_to_hikvision_device(self.server_ip, self.server_port, self.username, self.password)
+    if(validate_http_response(response))
+      return true
+    else
+      raise 'Failed to connect to HikVision device.'
+    end
+  end
+
   # extract milestone camera info from milestone system info xml
   def milestone_add_cameras(xml_string)
     doc = Nokogiri::XML(xml_string)
@@ -121,25 +135,6 @@ class Vms < ActiveRecord::Base
       end
     end
     return cameras
-  end
-
-  # getMonitors returns a HashMap<monitorName, monitorWatchPath>,
-  # nil if an error occurred or empty HashMap if no monitors
-  def zoneminder_get_monitors(url, cookie)
-    monitors = nil # return val
-    response = Unirest.get(url, headers:{"Cookie" => cookie.join(" ")})
-    if response.code == 200
-      monitors = Hash.new # a hashmap
-      page = Nokogiri::HTML(response.body)
-      page.css('tbody//tr//td[class="colName"]').each do |monitorInfo|
-        monitorName = monitorInfo.inner_text
-        monitorWatchPath = monitorInfo.children[0].attribute("href")
-        monitors[monitorName] = monitorWatchPath
-      end
-    else
-      raise 'Failed to connect to the ZoneMinder server.'
-    end
-    return monitors
   end
 
   # zoneminder get monitors returns a HashMap<monitorName, monitorWatchPath>,
@@ -167,6 +162,37 @@ class Vms < ActiveRecord::Base
     end
   end
 
+  def hikvision_add_monitors
+    response = connect_to_hikvision_device(self.server_ip, self.server_port, self.username, self.password)
+    doc = Nokogiri::XML(response.body) # response is an xml
+    doc.remove_namespaces!
+    doc.xpath('//StreamingChannelList/StreamingChannel').each do |channel|
+      if(channel.xpath('enabled')[0].content.to_s == 'true' &&
+          channel.xpath('//ControlProtocol/streamingTransport')[0].inner_text == 'RTSP' &&
+          channel.xpath('//Video/enabled')[0].inner_text == 'true')
+        camera = Camera.new
+        camera.camera_id = channel.xpath('id')[0].inner_text
+        camera.description = channel.xpath('channelName')[0].inner_text
+        camera.name = camera.camera_id
+        if(!camera.name.nil? && !camera.camera_id.nil?)
+          camera.verified = true
+        end
+        self.cameras.push(camera)
+        camera.hikvision_grab_default_frame
+        stream = Stream.new
+        stream.name = "Default - #{camera.name}"
+        stream.width = channel.xpath('//Video/videoResolutionWidth')[0].inner_text.to_i
+        stream.height = channel.xpath('//Video/videoResolutionHeight')[0].inner_text.to_i
+        stream.compression_rate = channel.xpath('//Video/fixedQuality')[0].inner_text.to_i
+        stream.keep_aspect_ratio = false
+        stream.allow_upsizing = false
+        stream.camera = camera
+        stream.save
+        stream.update(:verified => true)
+      end
+    end
+  end
+
   def connect_to_milestone_enterprise(server_name, server_port, username, password)
     url = "http://#{server_name}/systeminfo.xml"
     return connect_with_basic_auth(url, server_port.to_i, username, password)
@@ -177,6 +203,7 @@ class Vms < ActiveRecord::Base
     return connect_with_basic_auth(url, server_port.to_i, username, password)
   end
 
+  # HTTP with basic auth. returns HTTP respose
   def connect_with_basic_auth(url, port_number, username, password)
     uri = URI.parse(url)
     http = Net::HTTP.new(uri.host, port_number)
@@ -187,8 +214,24 @@ class Vms < ActiveRecord::Base
     begin
       return http.request(request)
     rescue
-      return nil
+      raise 'Failed to connect to the Server using provided IP and Port.'
     end
+  end
+
+  # validate HTTP response
+  def validate_http_response(response)
+    if(!response.nil?)
+      if(response.code == '404') # host could not found
+        raise 'Invalid Server IP or Server Port.'
+      elsif(response.code == '200')
+        return true
+      elsif(response.code == '401')
+        raise 'Invalid Username or Password.'
+      else
+        raise "Could not connect to the Server. HTTP error: #{response.message}."
+      end
+    end
+    return false
   end
 
   # zoneminder login returns cookie (as an Array) after successful auth or nil if login failed
@@ -210,33 +253,6 @@ class Vms < ActiveRecord::Base
       raise error_msg
     end
     return cookie
-  end
-
-  # zoneminder get stream info of each monitor
-  # returns a HashMap<monitorName, Array[streamUrl, streamWidth, streamHeight]>
-  # returns nil if an error occurred or empty HashMap if no streams
-  def zoneminder_get_streams(url, cookie, monitors)
-    streams = nil # return val
-    if !monitors.empty?
-      streams = Hash.new # a hashmap
-      monitors.each do |monitorName, monitorWatchPath|
-        monitorWatchUrl = "#{url}#{monitorWatchPath}"
-        response = Unirest.post(monitorWatchUrl, headers:{"Cookie" => cookie.join(" ")})
-        if response.code == 200
-          page = Nokogiri::HTML(response.body)
-          streamInfo = page.css('div#imageFeed//img#liveStream')[0]
-          if(!streamInfo.nil?)
-            streamUrl = streamInfo.attribute("src")
-            streamWidth = streamInfo.attribute("width")
-            streamHeight = streamInfo.attribute("height")
-            streams[monitorName] = [streamUrl, streamWidth, streamHeight]
-          end
-        else
-          puts "Error [getStreams]: Cannot connect to host."
-        end
-      end
-    end
-    return streams
   end
 
   def zoneminder_add_streams(url, cookie, monitors)
@@ -278,31 +294,16 @@ class Vms < ActiveRecord::Base
     end
   end
 
-  def zoneminder_add_stream(url, cookie, camera)
-    monitorWatchUrl = "#{url}#{camera.camera_id}"
-    response = Unirest.post(monitorWatchUrl, headers:{"Cookie" => cookie.join(" ")})
-    if(response.code == 200)
-      page = Nokogiri::HTML(response.body)
-      streamInfo = page.css('div#imageFeed//img#liveStream')[0]
-      if(!streamInfo.nil?)
-        stream = Stream.new
-        stream.name = "Default - #{camera.name}"
-        streamUrl = streamInfo.attribute("src")
-        stream.description = streamUrl
-        stream.width = streamInfo.attribute("width").to_s.to_i
-        stream.height = streamInfo.attribute("height").to_s.to_i
-        camera.streams.push(stream)
-      end
-    else
-      raise 'Failed to connect to ZoneMinder server.'
-    end
-  end
-
   def create_zoneminder_url(ip, port)
     if(port == 80)
       return "http://#{ip}/index.php"
     end
     return "http://#{ip}:#{port}/index.php"
+  end
+
+  def connect_to_hikvision_device(server_name, server_port, username, password)
+    url = "http://#{server_name}/ISAPI/Streaming/channels"
+    return connect_with_basic_auth(url, server_port.to_i, username, password)
   end
 
   # Private methods end

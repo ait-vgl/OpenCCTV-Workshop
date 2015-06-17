@@ -85,7 +85,7 @@ class Stream < ActiveRecord::Base
     complete = false
     width = -1
     height = -1
-    img_path = "#{Rails.root}/app/assets/images/#{self.camera.vms.id}_#{self.camera.id}_#{self.id}.jpeg"
+    img_path = "#{Rails.root}/app/assets/images/#{self.camera.vms.id}_#{self.camera.id}.jpeg"
     cmd = "java -jar #{Rails.root}/app/assets/programs/ZoneminderFrameGrabber/zm_grab_stream_frame.jar #{streamUrl} #{img_path}"
     stdin, stdout, stderr = Open3.popen3(cmd)
     output = stdout.readline
@@ -102,10 +102,8 @@ class Stream < ActiveRecord::Base
   end
 
   def delete_frame
-    path_to_file = "#{self.camera.vms.id}_#{self.camera.id}_#{self.id}.jpeg"
-    if(self.name.start_with?("Default - "))
-      File.delete(path_to_file) if File.exist?(path_to_file)
-    end
+    path_to_file = "#{Rails.root}/app/assets/images/#{self.camera.vms.id}_#{self.camera.id}_#{self.id}.jpeg"
+    File.delete(path_to_file) if File.exist?(path_to_file)
   end
 
 end

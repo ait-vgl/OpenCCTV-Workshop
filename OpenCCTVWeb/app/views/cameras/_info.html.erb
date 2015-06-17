@@ -11,7 +11,9 @@
       <th>Camera ID</th>
       <th>Description</th>
       <th> </th>
+      <% if(@camera.vms.vms_type != 'other') %>
       <th> </th>
+      <% end %>
     </tr>
     </thead>
 
@@ -33,9 +35,11 @@
                   </span>
             <% end %>
           </td>
+          <% if(@camera.vms.vms_type != 'other') %>
           <td>
             <%= image_tag("#{@camera.vms.id}_#{@camera.id}.jpeg", :alt => 'Default frame from Camera comes here.', width: '320') %>
           </td>
+          <% end %>
         </tr>
     </tbody>
   </table>

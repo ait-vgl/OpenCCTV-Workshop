@@ -45,8 +45,14 @@
   </table>
 </div>
 
+<% if(@stream.camera.vms.vms_type != 'other') %>
 <center>
 <div class="container">
-  <%= image_tag("#{@camera.vms.id}_#{@camera.id}_#{@stream.id}.jpeg", :alt => 'Default frame of Stream comes here.', width: '720') %>
+  <% if(@stream.name.start_with?('Default - ') && @stream.camera.vms.vms_type != 'milestone') %>
+      <%= image_tag("#{@camera.vms.id}_#{@camera.id}.jpeg", :alt => 'Default frame of Stream comes here.', width: '720') %>
+  <% else %>
+      <%= image_tag("#{@camera.vms.id}_#{@camera.id}_#{@stream.id}.jpeg", :alt => 'Default frame of Stream comes here.', width: '720') %>
+  <% end %>
 </div>
 </center>
+<% end %>
