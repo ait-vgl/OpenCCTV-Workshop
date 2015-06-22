@@ -20,6 +20,7 @@ void ResultRouterThread::operator()()
 	ApplicationModel* pModel = ApplicationModel::getInstance();
 	if(pModel->containsResultsOutputQueueAddress(_iAnalyticInstanceId))
 	{
+		//Initialize the ZMQ connection to the analytic instance's output queue
 		bool bConnected = false;
 		mq::TcpMqReceiver receiver;
 		try
@@ -33,7 +34,20 @@ void ResultRouterThread::operator()()
 			sErrMsg.append(e.what());
 			util::log::Loggers::getDefaultLogger()->error(sErrMsg);
 		}
-		while(bConnected && _pFlowController)
+
+		//Create the AnalyticResultGateway to the DB
+		opencctv::db::AnalyticResultGateway* _pAnalyticResultGateway = NULL;
+		try
+		{
+			_pAnalyticResultGateway = new opencctv::db::AnalyticResultGateway();
+
+		}catch(opencctv::Exception &e)
+		{
+			util::log::Loggers::getDefaultLogger()->error(e.what());
+		}
+
+		//Start inserting the analytic instance's results to the results DB
+		while(bConnected && _pFlowController && _pAnalyticResultGateway)
 		{
 			std::string* pSSerializedResult = receiver.receive();
 			analytic::AnalyticResult result = _pSerializer->deserializeAnalyticResult(*pSSerializedResult);
@@ -48,7 +62,7 @@ void ResultRouterThread::operator()()
 				{
 					opencctv::db::AnalyticResultGateway analyticResultGateway;
 					analyticResultGateway.insertResults(_iAnalyticInstanceId, result);
-					sMsg = "\t\t\tResult written to the database";
+					//sMsg = "\t\t\tResult written to the database";
 					util::log::Loggers::getDefaultLogger()->debug(sMsg);
 
 				}catch(opencctv::Exception &e)
@@ -60,7 +74,6 @@ void ResultRouterThread::operator()()
 					util::log::Loggers::getDefaultLogger()->error(sMsg);
 				}
 			}
-
 
 			_pFlowController->received();
 			if(pSSerializedResult) delete pSSerializedResult;

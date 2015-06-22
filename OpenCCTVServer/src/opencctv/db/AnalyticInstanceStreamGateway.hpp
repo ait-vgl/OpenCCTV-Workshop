@@ -24,6 +24,7 @@ namespace db {
 class AnalyticInstanceStreamGateway {
 private:
 	sql::Connection* _pDbConnPtr;
+	sql::PreparedStatement* _pStatementPtr;
 	static const std::string _SELECT_ANALYTIC_INSTANCE_STREAM_SQL;
 
 public:

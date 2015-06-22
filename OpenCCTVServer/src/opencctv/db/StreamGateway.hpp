@@ -23,6 +23,7 @@ namespace db {
 class StreamGateway {
 private:
 	sql::Connection* _pDbConnPtr;
+	sql::Statement* _pStatement;
 	static const std::string _SELECT_STREAM_SQL;
 
 public:

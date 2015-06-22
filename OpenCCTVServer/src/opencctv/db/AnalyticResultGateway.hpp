@@ -26,6 +26,7 @@ class AnalyticResultGateway {
 private:
 private:
 	sql::Connection* _pDbConnPtr;
+	sql::PreparedStatement* _pStatementPtr;
 	static const std::string _INSERT_ANALYTIC_RESULT_SQL;
 
 public:

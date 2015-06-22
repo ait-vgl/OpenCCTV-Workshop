@@ -14,20 +14,20 @@ const std::string StreamGateway::_SELECT_STREAM_SQL = "SELECT DISTINCT s.id, s.w
 
 StreamGateway::StreamGateway() {
 	_pDbConnPtr = DbConnector::getConnection();
+	_pStatement = (*_pDbConnPtr).createStatement();
 }
 
 StreamGateway::~StreamGateway() {
-	delete _pDbConnPtr;
-	_pDbConnPtr = NULL;
+	(*_pStatement).close();
+	delete _pStatement; _pStatement = NULL;
+	delete _pDbConnPtr; _pDbConnPtr = NULL;
 }
 
 void StreamGateway::findAll(std::vector<opencctv::dto::Stream>& vToStoreStreams)
 {
-
 	try
 	{
-		sql::Statement* pStatement = (*_pDbConnPtr).createStatement();
-		sql::ResultSet* pResultsPtr = (*pStatement).executeQuery(_SELECT_STREAM_SQL);
+		sql::ResultSet* pResultsPtr = (*_pStatement).executeQuery(_SELECT_STREAM_SQL);
 		opencctv::dto::Stream stream;
 		while((*pResultsPtr).next())
 		{
@@ -43,25 +43,13 @@ void StreamGateway::findAll(std::vector<opencctv::dto::Stream>& vToStoreStreams)
 			stream.setVmsServerPort((*pResultsPtr).getInt("server_port"));
 			stream.setVmsUsername((*pResultsPtr).getString("username"));
 			stream.setVmsPassword((*pResultsPtr).getString("password"));
-
-			//opencctv::util::Config* pConfig = opencctv::util::Config::getInstance();
-			//std::string sVmsConBasePath = pConfig->get(opencctv::util::PROPERTY_VMS_CONNECTOR_DIR);
-			//std::string sVmsConnectorDir = (*pResultsPtr).getString("filename");
-			//std::string sVmsConnectorDirLocation;
-			//sVmsConnectorDirLocation.append(sVmsConBasePath);
-			//sVmsConnectorDirLocation.append("/");
-			//sVmsConnectorDirLocation.append(sVmsConnectorDir);
-			//stream.setVmsConnectorDirLocation(sVmsConnectorDirLocation);
-
 			stream.setVmsConnectorFilename((*pResultsPtr).getString("filename"));
 			stream.setVmsConnectorDirLocation((*pResultsPtr).getString("filename"));
 
 			vToStoreStreams.push_back(stream);
 		}
 		(*pResultsPtr).close();
-		(*pStatement).close();
 		delete pResultsPtr;
-		delete pStatement;
 
 	}catch(sql::SQLException &e)
 	{
