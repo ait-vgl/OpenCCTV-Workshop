@@ -12,9 +12,22 @@ namespace db {
 
 const std::string StreamGateway::_SELECT_STREAM_SQL = "SELECT DISTINCT s.id, s.width, s.height, s.keep_aspect_ratio, s.allow_upsizing, s.compression_rate, ca.camera_id, vms.vms_connector_id, vms.server_ip, vms.server_port, vms.username, vms.password, vmsc.filename FROM streams AS s, cameras AS ca, vmses as vms, vms_connectors as vmsc WHERE (s.verified = TRUE) AND (s.camera_id = ca.id) AND (ca.vms_id = vms.id) AND (vms.vms_connector_id = vmsc.id) AND (s.id IN (SELECT DISTINCT ais.stream_id FROM analytic_instance_streams as ais))";
 
-StreamGateway::StreamGateway() {
-	_pDbConnPtr = DbConnector::getConnection();
-	_pStatement = (*_pDbConnPtr).createStatement();
+StreamGateway::StreamGateway()
+{
+	try
+	{
+		_pDbConnPtr = DbConnector::getConnection();
+		_pStatement = (*_pDbConnPtr).createStatement();
+	}catch(sql::SQLException &e)
+	{
+		std::string sErrorMsg = "Error while initializing the StreamGateway - .";
+		throw opencctv::Exception(sErrorMsg.append(e.what()));
+	}
+	catch(opencctv::Exception& e)
+	{
+		throw opencctv::Exception(e);
+	}
+
 }
 
 StreamGateway::~StreamGateway() {

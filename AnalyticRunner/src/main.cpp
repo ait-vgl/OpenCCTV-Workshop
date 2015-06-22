@@ -18,6 +18,7 @@
 #include "analytic/ConsumerThread.hpp"
 #include "opencctv/util/serialization/gpb/ProtoBuf.hpp"
 #include "analytic/util/Config.hpp"
+#include "analytic/ImageQueue.hpp"
 
 #include <iostream>
 
@@ -65,8 +66,11 @@ int main(int argc, char* argv[])
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Creating Results output queue done.");
 
 	// Creating internal input, output queue
-	analytic::ConcurrentQueue<analytic::api::Image_t>* pInputImageQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);
-	analytic::ConcurrentQueue<analytic::api::Image_t>* pOutputResultQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);
+	/*analytic::ConcurrentQueue<analytic::api::Image_t>* pInputImageQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);
+	analytic::ConcurrentQueue<analytic::api::Image_t>* pOutputResultQueue = new analytic::ConcurrentQueue<analytic::api::Image_t>(5);*/
+	analytic::ImageQueue<analytic::api::Image_t>* pInputImageQueue = new analytic::ImageQueue<analytic::api::Image_t>(5);
+	analytic::ImageQueue<analytic::api::Image_t>* pOutputResultQueue = new analytic::ImageQueue<analytic::api::Image_t>(5);
+
 	opencctv::util::log::Loggers::getDefaultLogger()->info("Creating internal input, output queue done.");
 
 	// Loading Analytic plugin

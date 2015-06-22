@@ -12,10 +12,22 @@ namespace db {
 
 const std::string AnalyticInstanceStreamGateway::_SELECT_ANALYTIC_INSTANCE_STREAM_SQL = "SELECT ainsts.id, ainsts.analytic_instance_id, ainps.name, a.filename FROM analytic_instance_streams AS ainsts, analytic_input_streams AS ainps, analytics AS a WHERE (ainsts.stream_id = ?) AND (ainsts.analytic_input_stream_id = ainps.id ) AND (ainps.analytic_id = a.id)";
 
-AnalyticInstanceStreamGateway::AnalyticInstanceStreamGateway() {
-	_pDbConnPtr = DbConnector::getConnection();
-	_pStatementPtr = (*_pDbConnPtr).prepareStatement(_SELECT_ANALYTIC_INSTANCE_STREAM_SQL);
+AnalyticInstanceStreamGateway::AnalyticInstanceStreamGateway()
+{
+	try
+	{
+		_pDbConnPtr = DbConnector::getConnection();
+		_pStatementPtr = (*_pDbConnPtr).prepareStatement(_SELECT_ANALYTIC_INSTANCE_STREAM_SQL);
 
+	}catch(sql::SQLException &e)
+	{
+		std::string sErrorMsg = "Error while initializing the AnalyticInstanceStreamGateway - .";
+		throw opencctv::Exception(sErrorMsg.append(e.what()));
+	}
+	catch(opencctv::Exception& e)
+	{
+		throw opencctv::Exception(e);
+	}
 }
 
 AnalyticInstanceStreamGateway::~AnalyticInstanceStreamGateway() {
