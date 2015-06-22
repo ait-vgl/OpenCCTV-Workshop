@@ -33,12 +33,34 @@ int main()
 	signal(SIGTERM, terminateHandler); // for Terminate signal
 	signal(SIGINT, terminateHandler); // for Ctrl + C keyboard interrupt
 
-	// Initializing varibles
+	// Initializing variables
 	//test::gateway::TestStreamGateway streamGateway;
-	opencctv::db::StreamGateway streamGateway;
+	opencctv::db::StreamGateway* pStreamGateway = NULL;
+	try
+	{
+		pStreamGateway = new opencctv::db::StreamGateway();
+	}
+	catch(opencctv::Exception &e)
+	{
+		std::string sErrMsg = "Failed to create StreamGateway -  ";
+		sErrMsg.append(e.what());
+		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+		return -1;
+	}
 
 	//test::gateway::TestAnalyticInstanceStreamGateway analyticInstanceGateway;
-	opencctv::db::AnalyticInstanceStreamGateway analyticInstanceGateway;
+	opencctv::db::AnalyticInstanceStreamGateway* pAnalyticInstanceGateway = NULL;
+	try
+	{
+		pAnalyticInstanceGateway = new opencctv::db::AnalyticInstanceStreamGateway();
+	}
+	catch(opencctv::Exception &e)
+	{
+		std::string sErrMsg = "Failed to create AnalyticInstanceStreamGateway -  ";
+		sErrMsg.append(e.what());
+		opencctv::util::log::Loggers::getDefaultLogger()->error(sErrMsg);
+		return -1;
+	}
 
 	opencctv::util::Config* pConfig = opencctv::util::Config::getInstance();
 	opencctv::ApplicationModel* pModel = opencctv::ApplicationModel::getInstance();
@@ -54,7 +76,7 @@ int main()
 	std::vector<opencctv::dto::Stream> vStreams;
 	try
 	{
-		streamGateway.findAll(vStreams);
+		pStreamGateway->findAll(vStreams);
 		opencctv::util::log::Loggers::getDefaultLogger()->info("Streams loaded.");
 	}
 	catch(opencctv::Exception &e)
@@ -71,7 +93,7 @@ int main()
 		std::vector<opencctv::dto::AnalyticInstanceStream> vAnalyticInstances;
 		try
 		{
-			analyticInstanceGateway.findAllForStream(stream.getId(), vAnalyticInstances);
+			pAnalyticInstanceGateway->findAllForStream(stream.getId(), vAnalyticInstances);
 			opencctv::util::log::Loggers::getDefaultLogger()->info("Analytic Instances Streams loaded.");
 		}
 		catch(opencctv::Exception &e)
@@ -141,6 +163,14 @@ int main()
 			pQueue = new opencctv::ConcurrentQueue<opencctv::Image>(internalQueueSize);
 			pModel->getInternalQueues()[stream.getId()] = pQueue;
 			pConsumer = new opencctv::ConsumerThread(stream.getId(), pMulticaster);
+
+			std::string sVmsPluginDirPath = pConfig->get(opencctv::util::PROPERTY_VMS_CONNECTOR_DIR);
+			if(*sVmsPluginDirPath.rbegin() != '/') // check last char
+			{
+				sVmsPluginDirPath.append("/");
+			}
+			sVmsPluginDirPath.append(stream.getVmsConnectorFilename());
+
 			// Loading VMS Connector Plugin
 			opencctv::api::VmsConnector* pVmsConnector = NULL;
 			opencctv::PluginLoader<opencctv::api::VmsConnector>* pVmsPluginLoader = NULL;
@@ -152,15 +182,7 @@ int main()
 			else {
 				try {
 					pVmsPluginLoader = new opencctv::PluginLoader<opencctv::api::VmsConnector>();
-					//std::string sVmsPluginPath = stream.getVmsConnectorDirLocation();
-					//sVmsPluginPath.append("/");
-					//sVmsPluginPath.append(stream.getVmsConnectorFilename());
-					std::string sVmsPluginDirPath = pConfig->get(opencctv::util::PROPERTY_VMS_CONNECTOR_DIR);
-					if(*sVmsPluginDirPath.rbegin() != '/') // check last char
-					{
-						sVmsPluginDirPath.append("/");
-					}
-					sVmsPluginDirPath.append(stream.getVmsConnectorFilename());
+
 					std::string sVmsPluginPath;
 					opencctv::util::Util::findSharedLibOfPlugin(sVmsPluginDirPath, sVmsPluginPath);
 					pVmsPluginLoader->loadPlugin(sVmsPluginPath);
@@ -195,7 +217,10 @@ int main()
 					stream.getCompressionRate() };
 			bool bVmsConnInitDone = false;
 			try {
-				bVmsConnInitDone = pVmsConnector->init(connInfo, stream.getVmsConnectorDirLocation());
+				//=======For Test Gateways====================================
+				//bVmsConnInitDone = pVmsConnector->init(connInfo, stream.getVmsConnectorDirLocation());
+				//============================================================
+				bVmsConnInitDone = pVmsConnector->init(connInfo, sVmsPluginDirPath);
 			} catch (std::exception &e) {
 				std::string sErrMsg =
 						"Failed to initialize VMS Connector plugin. ";
