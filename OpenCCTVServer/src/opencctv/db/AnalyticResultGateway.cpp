@@ -32,12 +32,12 @@ AnalyticResultGateway::AnalyticResultGateway() {
 }
 
 AnalyticResultGateway::~AnalyticResultGateway() {
-	delete _pDbConnPtr;
-	_pDbConnPtr = NULL;
-
 	(*_pStatementPtr).close();
 	delete _pStatementPtr;
 	_pStatementPtr = NULL;
+
+	delete _pDbConnPtr;
+	_pDbConnPtr = NULL;
 }
 
 int AnalyticResultGateway::insertResults(unsigned int iAnalyticInstanceId,analytic::AnalyticResult analyticResult)
