@@ -10,4 +10,4 @@ Analytic process contains 3 threads.
 2. **Analytic** is loaded (from the shared library) by the main thread and runs it to analyze images pushed into the internal input image queue and push analytic results of each and every input image into internal output results queue.
 3. **analytic::ConsumerThread** receives analytic results from the internal output results queue, serializes them and writes them into remote output results queue. These analytic results will be received by the OpenCCTV server's Analytic Results Router Threads.
 
-![analytic runner design diagram comes here.](https://github.com/lakinduboteju/opencctv-dev/blob/master/AnalyticRunner/opencctv_analytic_runner_design.png "Analytic Runner design")
+![analytic runner design diagram comes here.](opencctv_analytic_runner_design.png "Analytic Runner design")
