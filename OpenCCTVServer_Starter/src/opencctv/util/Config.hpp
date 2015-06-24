@@ -19,7 +19,7 @@ namespace opencctv {
 namespace util {
 
 const std::string PROPERTY_OPENCCTV_SERVER_PORT = "opencctv_server_starter_port";
-const std::string PROPERTY_OPENCCTV_SERVER_DIR = "opencctv_server_directory";
+const std::string PROPERTY_OPENCCTV_SERVER_DIR = "opencctv_server_path";
 
 class Config {
 private:
