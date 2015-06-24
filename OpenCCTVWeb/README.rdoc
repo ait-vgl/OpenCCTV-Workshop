@@ -3,30 +3,28 @@
 This README would normally document whatever steps are necessary to get the
 application up and running.
 
-1. Open `/usr/local/opencctv/OpenCCTVWeb/config/database.yml` using a text editor and change MySQL username and password.
-2. Go back to `/usr/local/opencctv/OpenCCTVWeb` and run following commands in the terminal:-
-```sh
+1. Open <tt>/usr/local/opencctv/OpenCCTVWeb/config/database.yml</tt> using a text editor and change MySQL username and password.
+2. Go back to <tt>/usr/local/opencctv/OpenCCTVWeb</tt> and run following commands in the terminal:
+<tt>
 $ bundle install
 $ rake db:create
 $ rake db:migrate
-```
-3. Start Web application which runs on port 3000.
-```sh
+</tt>
+3. Start Web application which runs on port 3000:
+<tt>
 $ rails s
-```
-
-Other details
+</tt>
 
 * Ruby version: 2.2.x
 * Rails version: 4.2.x
 
-* System dependencies: `net/http`, `uri`, `open3`, `unirest` gems
+* System dependencies: <tt>net/http</tt>, <tt>uri</tt>, <tt>open3</tt>, <tt>unirest</tt> gems
 
-* Configuration: ```$ bundle install```
+* Configuration: <tt>$ bundle install</tt>
 
-* Database creation: ```$ rake db:create```
+* Database creation: <tt>$ rake db:create</tt>
 
-* Database initialization: ```$ rake db:migrate```
+* Database initialization: <tt>$ rake db:migrate</tt>
 
 * How to run the test suite
 
