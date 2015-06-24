@@ -13,8 +13,8 @@ default: &default
   adapter: mysql2
   encoding: utf8
   pool: 5
-  username: opencctv
-  password: OpenCCTV@1
+  username: username
+  password: password
   host: localhost
   socket: /var/run/mysqld/mysqld.sock
 
