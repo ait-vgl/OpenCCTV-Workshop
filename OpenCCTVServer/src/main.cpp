@@ -25,9 +25,11 @@ void terminateHandler(int signum); // Terminate signal handler
 
 int main()
 {
+	/*
 	// Sending PID of OpenCCTV Server process to OpenCCTV Starter process through stdout
 	fprintf(stdout, opencctv::util::Util::getPidMessage(getpid()).c_str());
 	fflush (stdout);
+	*/
 
 	// Registering signal handlers
 	signal(SIGTERM, terminateHandler); // for Terminate signal
