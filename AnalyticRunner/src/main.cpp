@@ -18,7 +18,7 @@
 #include "analytic/ConsumerThread.hpp"
 #include "opencctv/util/serialization/gpb/ProtoBuf.hpp"
 #include "analytic/util/Config.hpp"
-#include "analytic/ImageQueue.hpp"
+//#include "analytic/ImageQueue.hpp"
 
 #include <iostream>
 
