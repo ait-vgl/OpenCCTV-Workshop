@@ -13,6 +13,23 @@ std::string currentDateTime() {
     return buf;
 }
 
+void generateBoundingBoxesXml(vector<Rect_<int> > vBoxes, std::string& sXml)
+{
+	std::stringstream ssXml;
+	ssXml << "<boxes>";
+	for(size_t i = 0; i < vBoxes.size(); ++i)
+	{
+		ssXml << "<box>";
+		ssXml << "<x>" << vBoxes[i].x << "</x>";
+		ssXml << "<y>" << vBoxes[i].y << "</y>";
+		ssXml << "<w>" << vBoxes[i].width << "</w>";
+		ssXml << "<h>" << vBoxes[i].height << "</h>";
+		ssXml << "</box>";
+	}
+	ssXml << "</boxes>";
+	sXml = ssXml.str();
+}
+
 FaceDetectAnalytic::FaceDetectAnalytic() : api::Analytic() {
 	pHaarCascade = NULL;
 	_dScaleFactor = 1.1;
@@ -102,20 +119,23 @@ void FaceDetectAnalytic::process(analytic::ConcurrentQueue<analytic::api::Image_
 		if(vFaces.size() > 0)
 		{
 			image.bGenerateAnalyticEvent = true;
-			stringstream ss;
-			ss << vFaces.size(); //face count
-			resultXml(ss.str(), image.sCustomTextResult);
+			resultXml(vFaces, image.sCustomTextResult);
 		}
 		/* 6. push into output queue */
 		pOutputQueue->push(image);
 	}
 }
 
-void FaceDetectAnalytic::resultXml(const std::string& sText, std::string& sToStoreXml)
+void FaceDetectAnalytic::resultXml(vector<Rect_<int> > vBoundingBoxes, std::string& sToStoreXml)
 {
-	std::map<std::string, std::string> mTagValrPairs;
-	mTagValrPairs["count"] = sText;
-	generateAnalyticResultXml(mTagValrPairs, sToStoreXml);
+	std::stringstream ssXml;
+	ssXml << "<result>";
+		ssXml << "<count>" << vBoundingBoxes.size() << "</count>";
+		std::string sbBXml;
+		generateBoundingBoxesXml(vBoundingBoxes, sbBXml);
+		ssXml << sbBXml;
+	ssXml << "</result>";
+	sToStoreXml = ssXml.str();
 }
 
 FaceDetectAnalytic::~FaceDetectAnalytic() {
