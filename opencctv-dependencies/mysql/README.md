@@ -6,6 +6,7 @@
 ``` sh
 $ sudo apt-get update
 $ sudo apt-get install mysql-server
+$ sudo apt-get install mysql-client
 
 $ mysql -u root -p
 [Enter root password]
@@ -15,4 +16,5 @@ If you want to create a new user and grant permissions, follow instructions give
 #### 2. Install MySQL C++ Connector
 ``` sh
 $ sudo apt-get install libmysqlcppconn-dev
+$ sudo apt-get install libmysqlclient-dev
 ```
