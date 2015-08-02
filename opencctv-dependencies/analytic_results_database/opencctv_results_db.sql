@@ -22,7 +22,7 @@ DROP TABLE IF EXISTS `results_development`.`results` ;
 
 CREATE TABLE IF NOT EXISTS `results_development`.`results` (
   `id` INT NOT NULL AUTO_INCREMENT,
-  `analytic_id` INT NULL,
+  `analytic_instance_id` INT NULL,
   `timestamp` VARCHAR(60) NULL,
   `result_text` VARCHAR(1000) NULL,
   PRIMARY KEY (`id`))
